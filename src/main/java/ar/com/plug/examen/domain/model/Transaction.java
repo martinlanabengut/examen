@@ -15,6 +15,9 @@ public class Transaction {
     @ManyToOne
     private Client client;
 
+    @ManyToOne
+    private Seller seller;
+
     private Integer quantity;
     private LocalDateTime date;
     private Boolean approved;
@@ -67,5 +70,13 @@ public class Transaction {
 
     public void setApproved(Boolean approved) {
         this.approved = approved;
+    }
+
+    public Seller getSeller() {
+        return seller;
+    }
+
+    public void setSeller(Seller seller) {
+        this.seller = seller;
     }
 }

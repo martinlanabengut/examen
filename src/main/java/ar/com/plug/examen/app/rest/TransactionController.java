@@ -2,7 +2,6 @@ package ar.com.plug.examen.app.rest;
 
 import ar.com.plug.examen.domain.model.Transaction;
 import ar.com.plug.examen.domain.service.TransactionService;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
