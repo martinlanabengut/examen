@@ -2,6 +2,9 @@ package ar.com.plug.examen.app.rest;
 
 import ar.com.plug.examen.domain.model.Product;
 import ar.com.plug.examen.domain.service.ProductService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,20 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    /**
+     * Create a new product.
+     *
+     * @param product the product to create
+     * @return the created product
+     */
+    @ApiOperation(value = "Create a new product", response = Product.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully created product"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         logger.info("Received request to create product: {}", product);
@@ -31,6 +48,19 @@ public class ProductController {
         }
     }
 
+    /**
+     * Get all products.
+     *
+     * @return the list of all products
+     */
+    @ApiOperation(value = "View a list of available products", response = List.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved list"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         logger.info("Received request to get all products");
@@ -44,6 +74,20 @@ public class ProductController {
         }
     }
 
+    /**
+     * Get product by ID.
+     *
+     * @param id the ID of the product to retrieve
+     * @return the product with the specified ID
+     */
+    @ApiOperation(value = "Get a product by Id", response = Product.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved product"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         logger.info("Received request to get product by id: {}", id);
@@ -63,6 +107,21 @@ public class ProductController {
         }
     }
 
+    /**
+     * Update an existing product.
+     *
+     * @param id the ID of the product to update
+     * @param productDetails the new details of the product
+     * @return the updated product
+     */
+    @ApiOperation(value = "Update an existing product", response = Product.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully updated product"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
         logger.info("Received request to update product with id: {}", id);
@@ -76,16 +135,30 @@ public class ProductController {
         }
     }
 
+    /**
+     * Delete a product.
+     *
+     * @param id the ID of the product to delete
+     * @return a response entity with a success message
+     */
+    @ApiOperation(value = "Delete a product")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully deleted product"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         logger.info("Received request to delete product with id: {}", id);
         try {
             productService.deleteProduct(id);
             logger.info("Product deleted successfully");
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok("Product deleted successfully");
         } catch (Exception e) {
             logger.error("Error deleting product: {}", e.getMessage());
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(500).body("Error deleting product: " + e.getMessage());
         }
     }
 }

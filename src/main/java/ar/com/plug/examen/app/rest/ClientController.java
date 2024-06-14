@@ -2,6 +2,10 @@ package ar.com.plug.examen.app.rest;
 
 import ar.com.plug.examen.domain.model.Client;
 import ar.com.plug.examen.domain.service.ClientService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,20 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
 
+    /**
+     * Create a new client.
+     *
+     * @param client the client to create
+     * @return the created client
+     */
+    @ApiOperation(value = "Create a new client", response = Client.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully created client"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
     @PostMapping
     public ResponseEntity<Client> createClient(@RequestBody Client client) {
         logger.info("Received request to create client: {}", client);
@@ -31,6 +49,19 @@ public class ClientController {
         }
     }
 
+    /**
+     * Get all clients.
+     *
+     * @return the list of all clients
+     */
+    @ApiOperation(value = "View a list of available clients", response = List.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved list"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
     @GetMapping
     public ResponseEntity<List<Client>> getAllClients() {
         logger.info("Received request to get all clients");
@@ -44,6 +75,20 @@ public class ClientController {
         }
     }
 
+    /**
+     * Get client by ID.
+     *
+     * @param id the ID of the client to retrieve
+     * @return the client with the specified ID
+     */
+    @ApiOperation(value = "Get a client by Id", response = Client.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved client"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<Client> getClientById(@PathVariable Long id) {
         logger.info("Received request to get client by id: {}", id);
@@ -63,6 +108,21 @@ public class ClientController {
         }
     }
 
+    /**
+     * Update an existing client.
+     *
+     * @param id the ID of the client to update
+     * @param clientDetails the new details of the client
+     * @return the updated client
+     */
+    @ApiOperation(value = "Update an existing client", response = Client.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully updated client"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody Client clientDetails) {
         logger.info("Received request to update client with id: {}", id);
@@ -76,16 +136,30 @@ public class ClientController {
         }
     }
 
+    /**
+     * Delete a client.
+     *
+     * @param id the ID of the client to delete
+     * @return a response entity with a success message
+     */
+    @ApiOperation(value = "Delete a client")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully deleted client"),
+            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
+            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
+    public ResponseEntity<String> deleteClient(@PathVariable Long id) {
         logger.info("Received request to delete client with id: {}", id);
         try {
             clientService.deleteClient(id);
             logger.info("Client deleted successfully");
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok("Client deleted successfully");
         } catch (Exception e) {
             logger.error("Error deleting client: {}", e.getMessage());
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(500).body("Error deleting client: " + e.getMessage());
         }
     }
 }
