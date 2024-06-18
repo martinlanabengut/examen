@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/clients")
@@ -30,9 +31,7 @@ public class ClientController {
     @ApiOperation(value = "Create a new client", response = Client.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully created client"),
-            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 400, message = "Invalid client data"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @PostMapping
@@ -42,9 +41,12 @@ public class ClientController {
             Client createdClient = clientService.createClient(client);
             logger.info("Client created successfully: {}", createdClient);
             return ResponseEntity.ok(createdClient);
+        } catch (IllegalArgumentException e) {
+            logger.error("Error creating client: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(null);
         } catch (Exception e) {
             logger.error("Error creating client: {}", e.getMessage());
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(500).body(null);
         }
     }
 
@@ -56,9 +58,6 @@ public class ClientController {
     @ApiOperation(value = "View a list of available clients", response = List.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved list"),
-            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @GetMapping
@@ -70,7 +69,7 @@ public class ClientController {
             return ResponseEntity.ok(clients);
         } catch (Exception e) {
             logger.error("Error retrieving clients: {}", e.getMessage());
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(500).body(null);
         }
     }
 
@@ -83,9 +82,7 @@ public class ClientController {
     @ApiOperation(value = "Get a client by Id", response = Client.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved client"),
-            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 404, message = "Client not found"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @GetMapping("/{id}")
@@ -103,7 +100,7 @@ public class ClientController {
                     });
         } catch (Exception e) {
             logger.error("Error retrieving client by id: {}", e.getMessage());
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(500).body(null);
         }
     }
 
@@ -117,9 +114,8 @@ public class ClientController {
     @ApiOperation(value = "Update an existing client", response = Client.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully updated client"),
-            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 400, message = "Invalid client data"),
+            @ApiResponse(code = 404, message = "Client not found"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @PutMapping("/{id}")
@@ -129,9 +125,15 @@ public class ClientController {
             Client updatedClient = clientService.updateClient(id, clientDetails);
             logger.info("Client updated successfully: {}", updatedClient);
             return ResponseEntity.ok(updatedClient);
+        } catch (IllegalArgumentException e) {
+            logger.error("Error updating client: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(null);
+        } catch (NoSuchElementException e) {
+            logger.error("Error updating client: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
             logger.error("Error updating client: {}", e.getMessage());
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(500).body(null);
         }
     }
 
@@ -144,9 +146,7 @@ public class ClientController {
     @ApiOperation(value = "Delete a client")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully deleted client"),
-            @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
-            @ApiResponse(code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
-            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
+            @ApiResponse(code = 404, message = "Client not found"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @DeleteMapping("/{id}")
@@ -156,6 +156,9 @@ public class ClientController {
             clientService.deleteClient(id);
             logger.info("Client deleted successfully");
             return ResponseEntity.ok("Client deleted successfully");
+        } catch (NoSuchElementException e) {
+            logger.error("Error deleting client: {}", e.getMessage());
+            return ResponseEntity.status(404).body("Error deleting client: Client not found");
         } catch (Exception e) {
             logger.error("Error deleting client: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error deleting client: " + e.getMessage());
