@@ -32,8 +32,8 @@ Todos los servicios cuentan, al menos, con test unitarios. Además, se han agreg
 
 Cobertura de Tests
 
-Cobertura de clases: 72%
-Cobertura de metodos: 92%
+- Cobertura de clases: 72%
+- Cobertura de metodos: 92%
 
 A continuación, se muestra un resumen de la cobertura de los tests:
 
